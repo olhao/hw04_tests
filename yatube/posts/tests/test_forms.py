@@ -36,6 +36,19 @@ class PostCreateFormTests(TestCase):
         )
         self.assertEqual(Post.objects.count(), posts_count + 1)
 
+    def test_new_post_not_created_in_database(self):
+        posts_count = Post.objects.count()
+        form_data = {
+            'text': 'Текст для теста test_new_post_not_created_in_database'
+        }
+        response = self.guest_client.post(
+            reverse('posts:post_create'),
+            data=form_data,
+            follow=True
+        )
+        self.assertRedirects(response, '/auth/login/?next=/create/')
+        self.assertEqual(Post.objects.count(), posts_count)
+
     def test_post_edited_in_database(self):
         post_id = self.post.pk
         form_data_edited = {
