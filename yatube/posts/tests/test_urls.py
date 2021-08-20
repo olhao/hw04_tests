@@ -10,9 +10,11 @@ User = get_user_model()
 
 class PostsURLTests(TestCase):
     home_url = '/'
+    posts_url = '/posts/'
     group_list_url = '/group/test-slug/'
     profile_url = '/profile/auth/'
     create_post_url = '/create/'
+    edit_url = '/edit/'
     unexisting_page_url = '/unexisting_page/'
 
     @classmethod
@@ -55,20 +57,21 @@ class PostsURLTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_url_exists_at_desired_location(self):
-        post_author_url = ('/posts/' + str(self.post_author.pk) + '/')
+        post_id = str(self.post_author.pk)
+        post_author_url = f'{self.posts_url}{post_id}{self.home_url}'
         response = self.guest_client.get(post_author_url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_edit_exists_at_desired_location(self):
-        post_edit_author_url = ('/posts/'
-                                + str(self.post_author.pk) + '/edit/')
+        post_id = str(self.post_author.pk)
+        post_edit_author_url = f'{self.posts_url}{post_id}{self.edit_url}'
         response = self.author_client.get(post_edit_author_url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_edit_not_exists(self):
-        post_edit_authorized_url = ('/posts/'
-                                    + str(self.post_author.pk) + '/edit/')
-        response = self.authorized_client.get(post_edit_authorized_url)
+        post_id = str(self.post_author.pk)
+        post_edit_author_url = f'{self.posts_url}{post_id}{self.edit_url}'
+        response = self.authorized_client.get(post_edit_author_url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_create_post_exists_at_desired_location(self):

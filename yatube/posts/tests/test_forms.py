@@ -2,12 +2,15 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from ..models import Post
+from ..models import Post, User
 
 User = get_user_model()
 
 
 class PostCreateFormTests(TestCase):
+    post_text_new = 'Текст для теста test_new_post_created_in_database'
+    post_author = 'auth'
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -35,6 +38,11 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
         self.assertEqual(Post.objects.count(), posts_count + 1)
+        self.assertEqual(getattr(Post.objects.first(), 'text'),
+                         self.post_text_new)
+        self.assertEqual(Post.objects.get(pk=1).author.username,
+                         self.post_author)
+        self.assertEqual(getattr(Post.objects.first(), 'group'), None)
 
     def test_new_post_not_created_in_database(self):
         posts_count = Post.objects.count()
@@ -46,7 +54,11 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertRedirects(response, '/auth/login/?next=/create/')
+        self.assertRedirects(response,
+                             reverse('users:login')
+                             + '?next='
+                             + reverse('posts:post_create'))
+
         self.assertEqual(Post.objects.count(), posts_count)
 
     def test_post_edited_in_database(self):
@@ -60,4 +72,4 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
         self.assertTrue(Post.objects.filter(
-            text='Отредактированный текст').exists())
+            text=form_data_edited.get('text')).exists())
