@@ -9,6 +9,7 @@ User = get_user_model()
 
 class PostCreateFormTests(TestCase):
     post_text_new = 'Текст для теста test_new_post_created_in_database'
+    post_text_edited = 'Отредактированный текст'
     post_author = 'auth'
 
     @classmethod
@@ -37,12 +38,13 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
+        post = Post.objects.first()
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        self.assertEqual(getattr(Post.objects.first(), 'text'),
+        self.assertEqual(post.text,
                          self.post_text_new)
         self.assertEqual(Post.objects.get(pk=1).author.username,
                          self.post_author)
-        self.assertEqual(getattr(Post.objects.first(), 'group'), None)
+        self.assertEqual(post.group, None)
 
     def test_new_post_not_created_in_database(self):
         posts_count = Post.objects.count()
@@ -71,5 +73,10 @@ class PostCreateFormTests(TestCase):
             data=form_data_edited,
             follow=True
         )
+        post = Post.objects.first()
         self.assertTrue(Post.objects.filter(
             text=form_data_edited.get('text')).exists())
+        self.assertEqual(post.text,
+                         self.post_text_edited)
+        self.assertEqual(Post.objects.get(pk=1).author.username,
+                         self.post_author)

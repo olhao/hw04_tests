@@ -70,7 +70,9 @@ class PostsURLTests(TestCase):
 
     def test_post_edit_not_exists(self):
         post_id = str(self.post_author.pk)
+
         post_edit_author_url = f'{self.posts_url}{post_id}{self.edit_url}'
+
         response = self.authorized_client.get(post_edit_author_url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
@@ -83,12 +85,13 @@ class PostsURLTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_urls_uses_correct_template_guest(self):
+        post_id = str(self.post_author.pk)
         templates_url_names = {
             'posts/index.html': '/',
             'posts/group_list.html': '/group/test-slug/',
             'posts/profile.html': '/profile/auth/',
             'posts/post_detail.html':
-                '/posts/' + str(self.post_author.pk) + '/',
+                f'/posts/{post_id}/',
         }
         for template_key, address_value in templates_url_names.items():
             with self.subTest(adress=address_value):
@@ -96,12 +99,13 @@ class PostsURLTests(TestCase):
                 self.assertTemplateUsed(response, template_key)
 
     def test_urls_uses_correct_template_authorized(self):
+        post_id = str(self.post_author.pk)
         templates_url_names = {
             'posts/index.html': '/',
             'posts/group_list.html': '/group/test-slug/',
             'posts/profile.html': '/profile/auth/',
             'posts/post_detail.html':
-                '/posts/' + str(self.post_author.pk) + '/',
+                f'/posts/{post_id}/',
             'posts/create_post.html': '/create/',
         }
         for template_key, address_value in templates_url_names.items():
