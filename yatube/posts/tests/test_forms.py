@@ -42,7 +42,7 @@ class PostCreateFormTests(TestCase):
         self.assertEqual(Post.objects.count(), posts_count + 1)
         self.assertEqual(post.text,
                          self.post_text_new)
-        self.assertEqual(Post.objects.get(pk=1).author.username,
+        self.assertEqual(post.author.username,
                          self.post_author)
         self.assertEqual(post.group, None)
 
@@ -78,5 +78,5 @@ class PostCreateFormTests(TestCase):
             text=form_data_edited.get('text')).exists())
         self.assertEqual(post.text,
                          self.post_text_edited)
-        self.assertEqual(Post.objects.get(pk=1).author.username,
+        self.assertEqual(post.author.username,
                          self.post_author)
